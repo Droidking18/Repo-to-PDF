@@ -1,5 +1,7 @@
 # SourceCode-to-PDF
 
+This is a fork of [Repo-to-PDF](https://github.com/BankkRoll/Repo-to-PDF) made for local directory use. 
+
 SourceCode-to-PDF is a tool that allows you to convert a directory of source code into a PDF file. It processes the files, and then creates a PDF.
 
 ## Example PDF
