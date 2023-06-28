@@ -1,27 +1,27 @@
-# Repo-to-PDF
+# SourceCode-to-PDF
 
-Repo-to-PDF is a tool that allows you to convert a GitHub repository into a PDF file. It clones the repository, processes the files, and then creates a PDF.
+SourceCode-to-PDF is a tool that allows you to convert a directory of source code into a PDF file. It processes the files, and then creates a PDF.
 
 ## Example PDF
 
 [FreeCodeCamp](https://github.com/freeCodeCamp/freeCodeCamp) repository was converted into a PDF from 42,998 files to 186,453 pages in under 2 minutes. This conversion is purely for example and stress testing purposes. All content belongs to the original authors at FreeCodeCamp. You can view the PDF [here](https://freecodecamppdf.bankkroll.repl.co).
-![Screenshot 2023-05-24 212226](https://github.com/BankkRoll/Repo-to-PDF/assets/106103625/9ceb176f-37f6-40d9-ab95-080942d2d7c0)
+![Screenshot 2023-05-24 212226](https://github.com/BankkRoll/SourceCode-to-PDF/assets/106103625/9ceb176f-37f6-40d9-ab95-080942d2d7c0)
 
 
 ## Installation
 
-To use Repo-to-PDF, you have two options: cloning the repository from GitHub or installing it directly using NPX. Choose the method that suits you best.
+To use SourceCode-to-PDF, you have two options: cloning the repository from GitHub or installing it directly using NPX. Choose the method that suits you best.
 
 ### Cloning the Repository
 
 1. Clone the repository:
 ```shell
-git clone https://github.com/BankkRoll/Repo-to-PDF
+git clone https://github.com/Droidking18/SourceCode-to-PDF
 ```
 
-2. Navigate to the Repo-to-PDF directory:
+2. Navigate to the SourceCode-to-PDF directory:
 ```shell
-cd Repo-to-PDF
+cd SourceCode-to-PDF
 ```
 
 3. Install the dependencies:
@@ -34,22 +34,9 @@ npm install
 npm start
 ```
 
-### Installing with NPX
-This will download and install the latest version of Repo-to-PDF from the NPM registry.
-
-1. Install Repo-to-PDF using NPX:
-```shell
-npx repo2pdf
-```
-
-2. Run Repo-to-PDF:
-```shell
-repo2pdf
-```
-
 ## Usage
 
-Once you have installed Repo-to-PDF, you can use it to generate PDF files from GitHub repositories.
+Once you have installed SourceCode-to-PDF, you can use it to generate PDF files from local directories.
 
 1. The script will install and start running. You will just follow the prompt:
 
@@ -58,14 +45,14 @@ You will be prompted to provide the following information:
 - The name of the output PDF file
 - Whether or not you wish to keep the cloned repository after generating the PDF
 
-The script will then clone the repository, process the files, and generate a PDF document based on the provided information.
+The script will then process the files, and generate a PDF document based on the provided information.
 
-Please note that you need to have Node.js installed on your system in order to run Repo-to-PDF.
+Please note that you need to have Node.js installed on your system in order to run SourceCode-to-PDF.
 
 
 ## Configuration
 
-Repo-to-PDF automatically ignores certain file types and directories (e.g., `.png`, `.git`). To customize the files and directories to ignore, edit the `excludedNames` and `excludedExtensions` variables in `clone.cjs`.
+SourceCode-to-PDF automatically ignores certain file types and directories (e.g., `.png`, `.git`). To customize the files and directories to ignore, edit the `excludedNames` and `excludedExtensions` variables in `clone.cjs`.
 
 
 ## Troubleshooting / FAQ
@@ -86,9 +73,9 @@ A: You can modify the code in `clone.cjs` to change the font, font size, colors,
 We welcome contributions! Here's how you can help:
 
 - **Report bugs:** If you find a bug, please create an issue on GitHub describing the problem.
-- **Suggest enhancements:** If you think of a way to improve Repo-to-PDF, we'd love to hear about it! Create an issue on GitHub to share your ideas.
+- **Suggest enhancements:** If you think of a way to improve SourceCode-to-PDF, we'd love to hear about it! Create an issue on GitHub to share your ideas.
 - **Write code:** If you'd like to contribute code to fix a bug or implement a new feature, please fork the repository, make your changes, and submit a pull request.
 
 ## License
 
-Repo-to-PDF is open source software, licensed under the MIT License. See the `LICENSE` file for more information.
+SourceCode-to-PDF is open source software, licensed under the MIT License. See the `LICENSE` file for more information.
