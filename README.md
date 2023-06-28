@@ -54,7 +54,7 @@ Once you have installed Repo-to-PDF, you can use it to generate PDF files from G
 1. The script will install and start running. You will just follow the prompt:
 
 You will be prompted to provide the following information:
-- The URL of the GitHub repository
+- The location of the directory, locally
 - The name of the output PDF file
 - Whether or not you wish to keep the cloned repository after generating the PDF
 
