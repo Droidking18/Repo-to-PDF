@@ -1,10 +1,8 @@
 #!/usr/bin/env node
 const fs = require('fs');
+const { type } = require('os');
 const fsPromises = fs.promises;
 const path = require('path');
-const { execSync } = require('child_process');
-
-const git = require('simple-git');
 const PDFDocument = require('pdfkit');
 const isBinaryFile = require('isbinaryfile').isBinaryFileSync;
 
@@ -21,7 +19,7 @@ Promise.all([import('chalk'), import('inquirer'), spinnerPromise]).then(([chalkM
     chalk = chalkModule.default;
     inquirer = inquirerModule.default;
     spinner.succeed('Setup complete');
-    askForRepoUrl();
+    askForDirectory();
 }).catch((err) => {
     spinnerPromise.then((spinner) => {
         spinner.fail('An error occurred during setup');
@@ -29,20 +27,15 @@ Promise.all([import('chalk'), import('inquirer'), spinnerPromise]).then(([chalkM
     console.error(err);
 });
 
-
-async function askForRepoUrl() {
+async function askForDirectory() {
     const questions = [
         {
-            name: 'repoUrl',
-            message: 'Please provide a GitHub repository URL:',
+            name: 'directoryPath',
+            message: 'Please provide the path to the local directory:',
             validate: function(value) {
-                var pass = value.match(
-                    /^https:\/\/github.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/
-                );
-                if (pass) {
-                    return true;
-                }
-                return 'Please enter a valid GitHub repository URL.';
+                return fs.existsSync(value) && fs.lstatSync(value).isDirectory()
+                    ? true
+                    : 'Please enter a valid directory path.';
             }
         },
         {
@@ -51,12 +44,13 @@ async function askForRepoUrl() {
             default: 'output.pdf'
         },
         {
-            type: 'list',
-            name: 'keepRepo',
-            message: 'Do you want to keep the cloned repository?',
-            choices: ['Yes', 'No'],
-            filter: function(val) {
-                return val.toLowerCase() === 'yes';
+            name: 'fileTypes',
+            message: 'Please provide the file types you want to include: (separate with comma) eg: "h,c,cpp,test.*"',
+            default: '',
+            validate: function(value) {
+                return value.length > 0
+                    ? true
+                    : 'Please enter at least one file type.';
             }
         }
     ];
@@ -75,56 +69,56 @@ Welcome to Repo-to-PDF! Let's get started...
 
     const answers = await inquirer.prompt(questions);
     console.log(chalk.cyanBright('\nProcessing your request...\n'));
-    main(answers.repoUrl, answers.outputFileName, answers.keepRepo);
+    main(answers.directoryPath, answers.outputFileName, answers.fileTypes);
 }
 
-async function main(repoUrl, outputFileName, keepRepo) {
-    const gitP = git();
-    const tempDir = './tempRepo';
+async function main(directoryPath, outputFileName, fileTypes) {
     const doc = new PDFDocument();
     doc.pipe(fs.createWriteStream(outputFileName));
 
     let fileCount = 0;
-    const spinner = ora(chalk.blueBright('Cloning repository...')).start();
+    const spinner = ora(chalk.blueBright('Processing files...')).start();
 
-    gitP.clone(repoUrl, tempDir).then(() => {
-        spinner.succeed(chalk.greenBright('Repository cloned successfully'));
-        spinner.start(chalk.blueBright('Processing files...'));
-        appendFilesToPdf(tempDir).then(() => {
-            doc.end();
-            spinner.succeed(chalk.greenBright(`PDF created with ${fileCount} files processed.`));
-            if (!keepRepo) {
-                fs.rmSync(tempDir, { recursive: true, force: true });
-                spinner.succeed(chalk.greenBright('Temporary repository has been deleted.'));
-            }
-        });
-    }).catch(err => {
-        spinner.fail(chalk.redBright('An error occurred'));
-        console.error(err);
+    appendFilesToPdf(directoryPath).then(() => {
+        doc.end();
+        spinner.succeed(chalk.greenBright(`PDF created with ${fileCount} files processed.`));
     });
 
     async function appendFilesToPdf(directory) {
+
+        let fileTypesArray = fileTypes.split(',');
         const files = await fsPromises.readdir(directory);
         for (let file of files) {
             const filePath = path.join(directory, file);
             const stat = await fsPromises.stat(filePath);
-    
-            const excludedNames = ['.gitignore', '.gitmodules', 'package-lock.json', 'yarn.lock', '.git'];
-            const excludedExtensions = ['.png', '.yml', '.jpg', '.jpeg', '.gif', '.svg', '.bmp', '.webp', '.ico', '.mp4', '.mov', '.avi', '.wmv'];
-    
-            // Check if file or directory should be excluded
-            if (excludedNames.includes(path.basename(filePath)) || excludedExtensions.includes(path.extname(filePath))) {
-                continue;
-            }
-    
+
             if (stat.isFile()) {
                 fileCount++;
                 spinner.text = chalk.blueBright(`Processing files... (${fileCount} processed)`);
-                let fileName = path.relative(tempDir, filePath);
+                let fileName = path.relative(directoryPath, filePath);
                 if (isBinaryFile(filePath)) {
-                    const data = fs.readFileSync(filePath).toString('base64');
-                    doc.addPage().font('Courier').fontSize(10).text(`${fileName}\n\nBASE64:\n\n${data}`, { lineGap: 4 });
+                    continue;
                 } else {
+
+                    let shouldSkip = true;
+
+                    for (let fileType of fileTypesArray) {
+
+                        fileType = fileType.replace('*', '');
+
+                        if (filePath.indexOf(fileType) > -1) {
+                            shouldSkip = false;
+                            break;
+                        }
+                    }
+
+                    console.warn(shouldSkip)
+
+                    if (shouldSkip) {
+                        continue;
+
+                    }
+
                     let data = await fsPromises.readFile(filePath, 'utf8');
                     data = data.replace(/Ð/g, '\n');
                     data = data.replace(/\r\n/g, '\n');
